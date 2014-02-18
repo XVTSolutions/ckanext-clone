@@ -1,0 +1,4 @@
+*.pyc
+.project
+.pydevproject
+ckanext_clone.egg-info/

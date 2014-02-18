@@ -39,7 +39,7 @@ class CloneController(BaseController):
             try:
                 plugins.toolkit.check_access('package_create', context)
             except plugins.toolkit.NotAuthorized:
-                plugins.toolkit.abort(401, _('Unauthorized to create a package'))
+                plugins.toolkit.abort(401, plugins.toolkit._('Unauthorized to create a package'))
                 
             #get current package...
             pkg_dict = plugins.toolkit.get_action('package_show')(None, data_dict)
