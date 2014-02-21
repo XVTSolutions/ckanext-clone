@@ -2,7 +2,7 @@ ckanext-clone
 ============
 Allows datasets to be cloned
 + adds Actions tab to dataset view page
-+ only users with permission to create datasets can perform reordering
++ only users with permission to create datasets can perform cloning
 
 Installation
 -------------

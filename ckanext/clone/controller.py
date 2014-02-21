@@ -57,6 +57,19 @@ class CloneController(BaseController):
             del pkg_dict['revision_id']
             del pkg_dict['revision_timestamp']
             
+            if pkg_dict['type'] == 'dataset-suspended':
+                pkg_dict['type'] = 'dataset'
+                if 'suspend_reason' in pkg_dict:
+                    del pkg_dict['suspend_reason'] 
+                
+#             if 'extras' in pkg_dict:
+#                 extras = [kvp for kvp in pkg_dict['extras'] if not kvp['value'] == '']
+#                 if extras :
+#                     pkg_dict['extras'] = extras 
+#                 else:
+#                     del pkg_dict['extras']
+                
+                                      
             #create a new one based on existing one...
             try:
                 pkg_dict_new = plugins.toolkit.get_action('package_create')(context, pkg_dict)
