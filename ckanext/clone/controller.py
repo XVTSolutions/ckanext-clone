@@ -38,8 +38,9 @@ class CloneController(BaseController):
             
             try:
                 plugins.toolkit.check_access('package_create', context)
+                #plugins.toolkit.check_access('package_update', context, data_dict)
             except plugins.toolkit.NotAuthorized:
-                plugins.toolkit.abort(401, plugins.toolkit._('Unauthorized to create a package'))
+                plugins.toolkit.abort(401, plugins.toolkit._('Unauthorized to clone this package'))
                 
             #get current package...
             pkg_dict = plugins.toolkit.get_action('package_show')(None, data_dict)
@@ -57,10 +58,10 @@ class CloneController(BaseController):
             del pkg_dict['revision_id']
             del pkg_dict['revision_timestamp']
             
-            if pkg_dict['type'] == 'dataset-suspended':
-                pkg_dict['type'] = 'dataset'
-                if 'suspend_reason' in pkg_dict:
-                    del pkg_dict['suspend_reason'] 
+#             if pkg_dict['type'] == 'dataset-suspended':
+#                 pkg_dict['type'] = 'dataset'
+#                 if 'suspend_reason' in pkg_dict:
+#                     del pkg_dict['suspend_reason'] 
                 
 #             if 'extras' in pkg_dict:
 #                 extras = [kvp for kvp in pkg_dict['extras'] if not kvp['value'] == '']
@@ -90,14 +91,7 @@ class CloneController(BaseController):
             
             ckan.plugins.toolkit.redirect_to(controller="package", action="edit", id=pkg_dict_new['id'])
         else :
-    
-            try:
-                plugins.toolkit.check_access('package_show', context, data_dict)
-            except plugins.toolkit.ObjectNotFound:
-                plugins.toolkit.abort(404, plugins.toolkit._('Dataset not found'))
-            except plugins.toolkit.NotAuthorized:
-                plugins.toolkit.abort(401, plugins.toolkit._('Unauthorized to read package %s') % id)
-    
+       
             try:
                 plugins.toolkit.c.pkg_dict = plugins.toolkit.get_action('package_show')(context, data_dict)
                 plugins.toolkit.c.pkg = context['package']
