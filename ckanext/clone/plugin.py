@@ -10,11 +10,11 @@ class ClonePlugin(plugins.SingletonPlugin):
     
     def before_map(self, map):
 
-        map.connect('clone', '/clone',
+        map.connect('clone', '/dataset/clone',
             controller='ckanext.clone.controller:CloneController',
             action='bad_url')
 
-        map.connect('clone', '/clone/{id}',
+        map.connect('clone', '/dataset/clone/{id}',
             controller='ckanext.clone.controller:CloneController',
             action='index')
 
