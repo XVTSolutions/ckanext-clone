@@ -14,6 +14,7 @@ from ckan.lib.helpers import dataset_link, dataset_display_name
 from ckan.lib.helpers import flash_error, flash_success, flash_notice
 from ckan.logic.validators import package_name_exists
 from ckan.logic.converters import convert_package_name_or_id_to_id as convert_to_id
+from ckanext.review.model import get_package_review, add_package_review, update_package_review
 
 class CloneController(BaseController):
     """
@@ -28,6 +29,8 @@ class CloneController(BaseController):
     def index(self, id):
         
         context = {
+                   'model': ckan.model,
+                   'session': ckan.model.Session,
                    'user': plugins.toolkit.c.user or plugins.toolkit.c.author,
                    'auth_user_obj': plugins.toolkit.c.userobj,
                    }
@@ -53,7 +56,11 @@ class CloneController(BaseController):
             pkg_dict['name'] = name
             pkg_dict['metadata_created'] = dt
             pkg_dict['metadata_modified'] = dt
-            
+            original_id = pkg_dict['id'];
+            original_next_review_date = pkg_dict.get('next_review_date');
+            if original_next_review_date:            
+                pkg_dict['next_review_date'] = original_next_review_date
+
             del pkg_dict['id']
             del pkg_dict['revision_id']
             del pkg_dict['revision_timestamp']
@@ -74,6 +81,14 @@ class CloneController(BaseController):
             #create a new one based on existing one...
             try:
                 pkg_dict_new = plugins.toolkit.get_action('package_create')(context, pkg_dict)
+                #if package already has a review date set, return it...
+                if original_next_review_date:
+                    package_review = get_package_review(ckan.model.Session, pkg_dict_new['id'])
+                    if package_review:
+                        package_review.next_review_date = original_next_review_date
+                        update_package_review(context['session'], package_review)
+                    else:
+                        add_package_review(context['session'], pkg_dict_new['id'], original_next_review_date)
             except plugins.toolkit.ValidationError as ve:
                 plugins.toolkit.c.pkg_dict = plugins.toolkit.get_action('package_show')(context, data_dict)
                 plugins.toolkit.c.pkg = context['package']
