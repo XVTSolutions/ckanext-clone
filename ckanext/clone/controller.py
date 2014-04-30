@@ -57,9 +57,6 @@ class CloneController(BaseController):
             pkg_dict['metadata_created'] = dt
             pkg_dict['metadata_modified'] = dt
             original_id = pkg_dict['id'];
-            original_next_review_date = pkg_dict.get('next_review_date');
-            if original_next_review_date:            
-                pkg_dict['next_review_date'] = original_next_review_date
 
             del pkg_dict['id']
             del pkg_dict['revision_id']
@@ -82,13 +79,13 @@ class CloneController(BaseController):
             try:
                 pkg_dict_new = plugins.toolkit.get_action('package_create')(context, pkg_dict)
                 #if package already has a review date set, return it...
-                if original_next_review_date:
+                if pkg_dict.get('next_review_date'):
                     package_review = get_package_review(ckan.model.Session, pkg_dict_new['id'])
                     if package_review:
-                        package_review.next_review_date = original_next_review_date
+                        package_review.next_review_date = pkg_dict.get('next_review_date')
                         update_package_review(context['session'], package_review)
                     else:
-                        add_package_review(context['session'], pkg_dict_new['id'], original_next_review_date)
+                        add_package_review(context['session'], pkg_dict_new['id'], pkg_dict.get('next_review_date'))
             except plugins.toolkit.ValidationError as ve:
                 plugins.toolkit.c.pkg_dict = plugins.toolkit.get_action('package_show')(context, data_dict)
                 plugins.toolkit.c.pkg = context['package']
